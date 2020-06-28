@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   python: circleci/python@0.3.0
+  aws-cli: circleci/aws-cli@1.2.0
 jobs:
   build:
     executor: python/default
@@ -13,21 +14,10 @@ jobs:
           name: Test
           command: nosetests tests/unit/
   deploy:
-    executor: python/default
+    executor: aws-cli/default
     steps:
-      - attach_workspace:
-          at: ~/chow-backend
-      - run:
-          name: Install SAM CLI
-          command: |
-            pip install --upgrade awscli
-            pip install --upgrade aws-sam-cli
-      - run:
-          name: Configure AWS
-          command: |
-            aws configure set aws_access_key_id AWS_ACCESS_KEY_ID
-            aws configure set aws_secret_access_key AWS_SECRET_ACCESS_KEY
-            aws configure set default.region us-east-2
+      - checkout
+      - aws-cli/setup
       - run:
           name: Install Zip
           command: brew install zip
@@ -36,3 +26,10 @@ jobs:
           command: |
             chmod +x ./scripts/deploy.sh
             ./scripts/deploy.sh
+workflows:
+  deploy_chow_backend:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
