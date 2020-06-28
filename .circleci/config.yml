@@ -1,7 +1,6 @@
 version: 2.1
 orbs:
   python: circleci/python@0.3.0
-  aws-cli: circleci/aws-cli@1.2.0
   sam: circleci/aws-sam-serverless@1.0.1
 jobs:
   build:
@@ -14,39 +13,21 @@ jobs:
       - run:
           name: Test
           command: nosetests tests/unit/
-  aws_deploy:
-    executor: aws-cli/default
-    steps:
-      - checkout
-      - aws-cli/setup
-      - run:
-          name: Install Zip
-          command: sudo apt-get install -y -qq zip
-      - run:
-          name: Deploy to AWS
-          command: |
-            chmod +x ./scripts/aws_deploy.sh
-            ./scripts/aws_deploy.sh
-  sam_deploy:
+  deploy:
     executor: sam/default
     steps:
       - checkout
       - sam/install
       - run:
-          name: SAM Deploy
+          name: Deploy to AWS
           command: |
-            chmod +x ./scripts/sam_deploy.sh
-            ./scripts/sam_deploy.sh
+            chmod +x ./scripts/deploy.sh
+            ./scripts/deploy.sh
 workflows:
   deploy_chow_backend:
     jobs:
       - build
-      - aws_deploy:
+      - deploy:
           context: CHOW_BACKEND
           requires:
             - build
-      - sam_deploy:
-          context: CHOW_BACKEND
-          requires:
-            - build
-            - aws_deploy
