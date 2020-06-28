@@ -23,7 +23,7 @@ jobs:
           name: Run Tests
           command: |
             pip install nose
-            nosetests tests/
+            nosetests tests/unit/
   deploy:
     <<: *container_config
     steps:
@@ -40,6 +40,9 @@ jobs:
             aws configure set aws_access_key_id AWS_ACCESS_KEY_ID
             aws configure set aws_secret_access_key AWS_SECRET_ACCESS_KEY
             aws configure set default.region us-east-2
+      - run:
+          name: Install Zip
+          command: sudo apt-get -y -qq install zip
       - run:
           name: Deploy to AWS
           command: |
