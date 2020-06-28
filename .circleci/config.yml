@@ -2,7 +2,7 @@ version: 2
 container_config: &container_config
   working_directory: ~/chow-backend
   docker:
-    - image: python:3.6.4
+    - image: python:3.8.2
 jobs:
   install:
     <<: *container_config
@@ -40,9 +40,6 @@ jobs:
             aws configure set aws_access_key_id AWS_ACCESS_KEY_ID
             aws configure set aws_secret_access_key AWS_SECRET_ACCESS_KEY
             aws configure set default.region us-east-2
-      - run:
-          name: Install Zip
-          command: apt-get -y -qq install zip
       - run:
           name: Deploy to AWS
           command: |

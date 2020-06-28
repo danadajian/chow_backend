@@ -23,7 +23,7 @@ Resources:
         Bucket: !Ref BucketName
         Key: !Ref CodeKey
       Handler: handler.my_handler
-      Runtime: python3.6
+      Runtime: python3.8
       Environment:
         Variables:
           AWS_KEY: !Ref AwsKey
