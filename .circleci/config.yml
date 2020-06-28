@@ -1,31 +1,19 @@
-version: 2
-container_config: &container_config
-  working_directory: ~/chow-backend
-  docker:
-    - image: python:3.8.2
+version: 2.1
+orbs:
+  python: circleci/python@0.3.0
 jobs:
-  install:
-    <<: *container_config
+  build:
+    executor: python/default
     steps:
       - checkout
+      - python/load-cache
+      - python/install-deps
+      - python/save-cache
       - run:
-          name: Install Dependencies
-          command: pip install -r requirements.txt
-      - persist_to_workspace:
-          root: ~/chow-backend
-          paths: .
-  test:
-    <<: *container_config
-    steps:
-      - attach_workspace:
-          at: ~/chow-backend
-      - run:
-          name: Run Tests
-          command: |
-            pip install nose
-            nosetests tests/unit/
+          name: Test
+          command: nosetests tests/unit/
   deploy:
-    <<: *container_config
+    executor: python/default
     steps:
       - attach_workspace:
           at: ~/chow-backend
@@ -42,25 +30,9 @@ jobs:
             aws configure set default.region us-east-2
       - run:
           name: Install Zip
-          command: sudo apt-get -y -qq install zip
+          command: brew install zip
       - run:
           name: Deploy to AWS
           command: |
             chmod +x ./scripts/deploy.sh
             ./scripts/deploy.sh
-workflows:
-  version: 2
-  deploy_chow_backend:
-    jobs:
-      - install
-      - test:
-          requires:
-            - install
-      - deploy:
-          context: CHOW_BACKEND
-          filters:
-            branches:
-              only:
-                - master
-          requires:
-            - test
