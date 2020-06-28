@@ -10,7 +10,9 @@ jobs:
       - checkout
       - run:
           name: Install Dependencies
-          command: pip install requirements.txt
+          command: |
+            pip install --upgrade pip
+            pip install requirements.txt
       - persist_to_workspace:
           root: ~/chow-backend
           paths: .
@@ -21,7 +23,9 @@ jobs:
           at: ~/chow-backend
       - run:
           name: Run Tests
-          command: pytest
+          command: |
+            pip install pytest
+            pytest
   deploy:
     <<: *container_config
     steps:
