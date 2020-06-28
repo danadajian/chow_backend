@@ -1,0 +1,69 @@
+version: 2
+container_config: &container_config
+  working_directory: ~/chow-backend
+  docker:
+    - image: node:11.10.1
+jobs:
+  install:
+    <<: *container_config
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: pip install requirements.txt
+      - persist_to_workspace:
+          root: ~/chow-backend
+          paths: .
+  test:
+    <<: *container_config
+    steps:
+      - attach_workspace:
+          at: ~/chow-backend
+      - run:
+          name: Run Tests
+          command: pytest
+  deploy:
+    <<: *container_config
+    steps:
+      - attach_workspace:
+          at: ~/chow-backend
+      - run:
+          name: Install SAM CLI
+          command: |
+            apt-get -y -qq update
+            apt-get -y -qq install python-dev
+            apt-get -y -qq install python-pip
+            pip install --upgrade awscli
+            pip install --upgrade aws-sam-cli
+      - run:
+          name: Configure AWS
+          command: |
+            aws configure set aws_access_key_id AWS_ACCESS_KEY_ID
+            aws configure set aws_secret_access_key AWS_SECRET_ACCESS_KEY
+            aws configure set default.region us-east-2
+      - run:
+          name: Install Zip
+          command: |
+            apt-get -y -qq update
+            apt-get -y -qq install zip
+      - run:
+          name: Deploy to AWS
+          command: |
+            chmod +x ./scripts/deploy.sh
+            ./scripts/deploy.sh
+workflows:
+  version: 2
+  deploy_chow_backend:
+    jobs:
+      - install
+      - test:
+          requires:
+            - install
+      - deploy:
+          context: CHOW_BACKEND
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - test

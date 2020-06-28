@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  BucketName:
+    Type: String
+  CodeKey:
+    Type: String
+  AwsKey:
+    Type: String
+  AwsSecret:
+    Type: String
+Globals:
+  Function:
+    MemorySize: 3000
+    Timeout: 900
+
+Resources:
+  AggregateRecipesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+        Bucket: !Ref BucketName
+        Key: !Ref CodeKey
+      Handler: handler.my_handler
+      Runtime: python3.6
+      Environment:
+        Variables:
+          AWS_KEY: !Ref AwsKey
+          AWS_SECRET: !Ref AwsSecret
