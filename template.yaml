@@ -22,7 +22,7 @@ Resources:
       CodeUri:
         Bucket: !Ref BucketName
         Key: !Ref CodeKey
-      Handler: handler.my_handler
+      Handler: src.handler.my_handler
       Runtime: python3.8
       Environment:
         Variables:
