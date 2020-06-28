@@ -2,7 +2,7 @@ version: 2
 container_config: &container_config
   working_directory: ~/chow-backend
   docker:
-    - image: node:11.10.1
+    - image: python:3.6.4
 jobs:
   install:
     <<: *container_config
@@ -10,11 +10,7 @@ jobs:
       - checkout
       - run:
           name: Install Dependencies
-          command: |
-            apt-get -y -qq update
-            apt-get -y -qq install python3.6
-            apt-get -y -qq install python-pip
-            pip install requirements.txt
+          command: pip install requirements.txt
       - persist_to_workspace:
           root: ~/chow-backend
           paths: .
