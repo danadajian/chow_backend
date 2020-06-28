@@ -20,7 +20,7 @@ jobs:
       - aws-cli/setup
       - run:
           name: Install Zip
-          command: brew install zip
+          command: apt-get install -y -qq zip
       - run:
           name: Deploy to AWS
           command: |
