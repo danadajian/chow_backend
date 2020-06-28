@@ -23,7 +23,7 @@ jobs:
           name: Run Tests
           command: |
             pip install nose
-            nosetests
+            nosetests ... tests/
   deploy:
     <<: *container_config
     steps:
